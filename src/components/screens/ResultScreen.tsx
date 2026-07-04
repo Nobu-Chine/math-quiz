@@ -1,13 +1,14 @@
-import type { AnswerRecord } from "@/lib/quiz-types";
+import type { AnswerRecord, QuizMode } from "@/lib/quiz-types";
 import { calcRank, RANK_COLORS } from "@/lib/rank";
 
 interface ResultScreenProps {
   answers: AnswerRecord[];
+  mode: QuizMode;
   onRestart: () => void;
   onShowWeakness: () => void;
 }
 
-export default function ResultScreen({ answers, onRestart, onShowWeakness }: ResultScreenProps) {
+export default function ResultScreen({ answers, mode, onRestart, onShowWeakness }: ResultScreenProps) {
   const total = answers.length;
   const score = answers.filter((a) => a.correct).length;
   const rank = calcRank(score, total);
@@ -16,6 +17,11 @@ export default function ResultScreen({ answers, onRestart, onShowWeakness }: Res
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="rounded-3xl bg-white p-8 text-center shadow-md">
+        {mode === "camp" && (
+          <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
+            🏕️ 合宿モード
+          </p>
+        )}
         <p className="text-slate-500">けっか</p>
         <p className="mt-2 text-5xl font-extrabold text-slate-700">
           {score} <span className="text-2xl font-semibold text-slate-400">/ {total}</span>

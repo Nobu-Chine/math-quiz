@@ -1,9 +1,10 @@
 interface TopScreenProps {
   onStart: () => void;
+  onStartCamp: () => void;
   onShowWeakness: () => void;
 }
 
-export default function TopScreen({ onStart, onShowWeakness }: TopScreenProps) {
+export default function TopScreen({ onStart, onStartCamp, onShowWeakness }: TopScreenProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-10 text-center">
       <div>
@@ -17,6 +18,12 @@ export default function TopScreen({ onStart, onShowWeakness }: TopScreenProps) {
           className="w-full rounded-2xl bg-violet-500 py-5 text-xl font-bold text-white shadow-lg shadow-violet-200 transition-transform active:scale-95"
         >
           スタート
+        </button>
+        <button
+          onClick={onStartCamp}
+          className="w-full rounded-2xl bg-orange-400 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-transform active:scale-95"
+        >
+          🏕️ 合宿モード(にがて集中)
         </button>
         <button
           onClick={onShowWeakness}

@@ -3,12 +3,13 @@
 import { useState } from "react";
 import type { Question } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
-import type { AnswerRecord } from "@/lib/quiz-types";
+import type { AnswerRecord, QuizMode } from "@/lib/quiz-types";
 
 interface QuizScreenProps {
   question: Question;
   questionNumber: number;
   totalQuestions: number;
+  mode: QuizMode;
   onNext: (record: AnswerRecord) => void;
 }
 
@@ -16,6 +17,7 @@ export default function QuizScreen({
   question,
   questionNumber,
   totalQuestions,
+  mode,
   onNext,
 }: QuizScreenProps) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -40,6 +42,11 @@ export default function QuizScreen({
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div>
+        {mode === "camp" && (
+          <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
+            🏕️ 合宿モード
+          </p>
+        )}
         <div className="flex items-center justify-between text-sm font-semibold text-slate-500">
           <span>
             もんだい {questionNumber} / {totalQuestions}

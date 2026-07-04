@@ -6,4 +6,6 @@ export interface AnswerRecord {
   correct: boolean;
 }
 
-export type Screen = "top" | "quiz" | "result" | "weakness";
+export type Screen = "top" | "loading" | "quiz" | "result" | "weakness";
+
+export type QuizMode = "normal" | "camp";
