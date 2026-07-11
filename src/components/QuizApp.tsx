@@ -12,7 +12,7 @@ import QuizScreen from "@/components/screens/QuizScreen";
 import ResultScreen from "@/components/screens/ResultScreen";
 import WeaknessScreen from "@/components/screens/WeaknessScreen";
 
-const QUESTION_COUNT = 10;
+const QUESTION_COUNT = 5;
 
 export default function QuizApp() {
   const [screen, setScreen] = useState<Screen>("login");
