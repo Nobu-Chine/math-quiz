@@ -198,12 +198,17 @@ function genG5(){ return G5_POOL[randInt(0,G5_POOL.length-1)](); }
 // ---- 6年生の単元(画像のカリキュラムに対応) ----
 function g6_symmetry(){
   const shapes = [
-    ['正方形',4], ['長方形',2], ['正三角形',3], ['二等辺三角形',1],
-    ['正五角形',5], ['正六角形',6], ['ひし形',2]
+    ['正方形',4,'たてと よこの真ん中を通る線が2本、さらに対角線が2本。折るとぴったり重なる線が全部で4本'],
+    ['長方形',2,'たてと よこの真ん中を通る線の2本だけ。対角線で折ると形がずれるので軸にならない'],
+    ['正三角形',3,'それぞれの頂点から向かい合う辺の真ん中を通る線が3本'],
+    ['二等辺三角形',1,'頂点(とがった角)から底辺の真ん中に引いた線の1本だけ'],
+    ['正五角形',5,'頂点の数と同じだけ、頂点から向かい合う辺の真ん中に線を引ける。5本'],
+    ['正六角形',6,'向かい合う頂点どうしを結ぶ線が3本、向かい合う辺の真ん中どうしを結ぶ線が3本、合わせて6本'],
+    ['ひし形',2,'2本の対角線が対称の軸(たて・よこの真ん中を通る線は軸にならない)']
   ];
-  const [name,axis] = shapes[randInt(0,shapes.length-1)];
+  const [name,axis,reason] = shapes[randInt(0,shapes.length-1)];
   return {text:`${name}の対称の軸は 何本？`, type:'numeric', answer:axis,
-    explain:`${name}には対称の軸が${axis}本あります`, category:'対称な図形'};
+    explain:`対称の軸とは、折るとぴったり重なる折り目の線のこと。${name}の場合: ${reason}。だから対称の軸は${axis}本`, category:'対称な図形'};
 }
 
 function g6_letterEq(){
@@ -212,15 +217,15 @@ function g6_letterEq(){
   if(type===0){
     x=randInt(1,20); a=randInt(1,20); b=x+a;
     text=`x + ${a} = ${b} のとき、xの値は？`;
-    explain=`x = ${b} − ${a} = ${x}`;
+    explain=`「x に ${a} をたすと ${b}」なので、逆にたどるには ${b} から ${a} を引けばよい。x = ${b} − ${a} = ${x}`;
   } else if(type===1){
     x=randInt(1,20); a=randInt(1,x); b=x-a;
     text=`x − ${a} = ${b} のとき、xの値は？`;
-    explain=`x = ${b} + ${a} = ${x}`;
+    explain=`「x から ${a} を引くと ${b}」なので、逆にたどるには ${b} に ${a} をたせばよい。x = ${b} + ${a} = ${x}`;
   } else {
     a=randInt(2,9); x=randInt(2,12); b=a*x;
     text=`${a} × x = ${b} のとき、xの値は？`;
-    explain=`x = ${b} ÷ ${a} = ${x}`;
+    explain=`「x に ${a} をかけると ${b}」なので、逆にたどるには ${b} を ${a} で割ればよい。x = ${b} ÷ ${a} = ${x}`;
   }
   return {text, type:'numeric', answer:x, explain, category:'文字と式'};
 }
@@ -241,9 +246,10 @@ function g6_fracMul(){
     const t = dd/gg===1 ? `${dn/gg}` : `${dn/gg}/${dd/gg}`;
     choices.add(t);
   }
+  const needsSimplify = g>1;
   return {text:`${n1}/${d1} × ${n2}/${d2} = ?`, type:'choice', answer:correct,
     choices:shuffle([...choices]),
-    explain:`分子どうし・分母どうしをかけて ${n1}×${n2}=${num}、${d1}×${d2}=${den} → ${correct}`,
+    explain:`分数どうしのかけ算は「分子どうし」「分母どうし」を別々にかける。${n1}×${n2}=${num}、${d1}×${d2}=${den} なので ${num}/${den}${needsSimplify ? `。これを最大公約数${g}で約分すると ${correct}` : `(これ以上約分できないので、そのまま ${correct})`}`,
     category:'分数のかけ算'};
 }
 
@@ -263,9 +269,10 @@ function g6_fracDiv(){
     const t = dd/gg===1 ? `${dn/gg}` : `${dn/gg}/${dd/gg}`;
     choices.add(t);
   }
+  const needsSimplify2 = g>1;
   return {text:`${n1}/${d1} ÷ ${n2}/${d2} = ?`, type:'choice', answer:correct,
     choices:shuffle([...choices]),
-    explain:`わる数の逆数をかける: ${n1}/${d1} × ${d2}/${n2} = ${num}/${den} = ${correct}`,
+    explain:`分数のわり算は、わる数(${n2}/${d2})をひっくり返して(逆数にして)かけ算にする。${n1}/${d1} ÷ ${n2}/${d2} → ${n1}/${d1} × ${d2}/${n2} = ${num}/${den}${needsSimplify2 ? `。約分すると ${correct}` : ``}`,
     category:'分数のわり算'};
 }
 
@@ -291,9 +298,10 @@ function g6_fracMulMixed(){
     const gg=gcd(dn,dd);
     choices.add(fracToText(dn/gg, dd/gg));
   }
+  const needsSimplify3 = g>1;
   return {text:`${whole}と${n1}/${d1} × ${n2}/${d2} = ?（仮分数で答えよう）`, type:'choice', answer:correct,
     choices:shuffle([...choices]),
-    explain:`帯分数を仮分数に直すと ${impNum}/${d1}。あとは分数どうしのかけ算: ${impNum}×${n2}=${num}、${d1}×${d2}=${den} → ${correct}`,
+    explain:`帯分数はそのままかけ算できないので、まず仮分数に直す。「整数×分母+分子」で ${whole}×${d1}+${n1}=${impNum}、つまり ${whole}と${n1}/${d1} = ${impNum}/${d1}。あとは分数どうしのかけ算: ${impNum}×${n2}=${num}、${d1}×${d2}=${den} で ${num}/${den}${needsSimplify3 ? `。約分すると ${correct}` : ``}`,
     category:'分数のかけ算'};
 }
 
@@ -321,11 +329,12 @@ function g6_intFracMul(){
     const gg=gcd(dn,dd);
     choices.add(fracToText(dn/gg, dd/gg));
   }
+  const needsSimplify4 = g>1;
   return {text:`${opText} = ?`, type:'choice', answer:correct,
     choices:shuffle([...choices]),
     explain: isDiv
-      ? `わる数の逆数をかける: ${whole} × ${d}/${n} = ${num}/${den} = ${correct}`
-      : `整数を分数として考える: ${whole}/1 × ${n}/${d} = ${num}/${den} = ${correct}`,
+      ? `整数も ${whole}/1 という分数として考えられる。わる数(${n}/${d})を逆数にしてかけ算にする: ${whole} ÷ ${n}/${d} → ${whole} × ${d}/${n} = ${num}/${den}${needsSimplify4 ? `。約分すると ${correct}` : ``}`
+      : `整数を ${whole}/1 という分数として考えると、あとは分数どうしのかけ算と同じ: ${whole}/1 × ${n}/${d} = ${num}/${den}${needsSimplify4 ? `。約分すると ${correct}` : ``}`,
     category: isDiv ? '分数のわり算' : '分数のかけ算'};
 }
 
@@ -344,7 +353,7 @@ function g6_ratio(){
   }
   return {text:`${a} : ${b} を簡単にすると？`, type:'choice', answer:correct,
     choices:shuffle([...choices]),
-    explain:`最大公約数${gg}で割って ${a/gg}:${b/gg}`, category:'比'};
+    explain:`比を簡単にするときは、両方の数を同じ数で割る。${a}と${b}の最大公約数は${gg}なので、両方を${gg}で割ると ${a}÷${gg}=${a/gg}、${b}÷${gg}=${b/gg}。だから ${a/gg}:${b/gg}`, category:'比'};
 }
 
 function g6_scale(){
@@ -354,7 +363,7 @@ function g6_scale(){
   const ans = Math.round((realCm/scaleDenom)*10)/10;
   return {text:`実際の長さが${real}mの道を、1/${scaleDenom}の縮図でかくと 何cmになる？`, type:'numeric',
     answer:ans, tolerance:0.05,
-    explain:`${real}m = ${realCm}cm。${realCm} ÷ ${scaleDenom} = ${ans}cm`, category:'拡大図と縮図'};
+    explain:`縮図は実際の長さを一定の割合で小さくした図。「1/${scaleDenom}の縮図」は実際の長さを${scaleDenom}で割るという意味。まず単位をそろえるために ${real}m を cm に直すと ${realCm}cm。それを ${scaleDenom} で割って ${realCm} ÷ ${scaleDenom} = ${ans}cm`, category:'拡大図と縮図'};
 }
 
 function g6_circleArea(){
@@ -362,7 +371,7 @@ function g6_circleArea(){
   const ans=Math.round(r*r*3.14*100)/100;
   return {text:`半径${r}cmの円の面積は？(円周率3.14・小数第2位まで)`, type:'numeric',
     answer:ans, tolerance:0.05,
-    explain:`半径×半径×3.14 = ${r}×${r}×3.14 = ${ans}cm²`, category:'円の面積'};
+    explain:`円の面積は「半径×半径×円周率」という公式で求める。半径が${r}cmなので、${r}×${r}×3.14 = ${ans}cm²`, category:'円の面積'};
 }
 
 function g6_volume(){
@@ -370,13 +379,14 @@ function g6_volume(){
     const a=randInt(2,12), b=randInt(2,12), c=randInt(2,12);
     const ans=a*b*c;
     return {text:`たて${a}cm、よこ${b}cm、高さ${c}cmの直方体の体積は？`, type:'numeric',
-      answer:ans, explain:`たて×よこ×高さ = ${a}×${b}×${c} = ${ans}cm³`, category:'角柱と円柱の体積'};
+      answer:ans, explain:`角柱の体積は「底面積×高さ」で求められる。直方体の底面積は たて×よこ = ${a}×${b}=${a*b}cm²。これに高さ${c}cmをかけて ${a*b}×${c} = ${ans}cm³`, category:'角柱と円柱の体積'};
   } else {
     const r=randInt(2,8), h=randInt(3,15);
+    const baseArea=Math.round(r*r*3.14*100)/100;
     const ans=Math.round(r*r*3.14*h*100)/100;
     return {text:`底面の半径${r}cm、高さ${h}cmの円柱の体積は？(円周率3.14)`, type:'numeric',
       answer:ans, tolerance:0.05,
-      explain:`底面積×高さ = (${r}×${r}×3.14)×${h} = ${ans}cm³`, category:'角柱と円柱の体積'};
+      explain:`円柱の体積も「底面積×高さ」で求める。底面は円なので、底面積は 半径×半径×3.14 = ${r}×${r}×3.14 = ${baseArea}cm²。これに高さ${h}cmをかけて ${baseArea}×${h} = ${ans}cm³`, category:'角柱と円柱の体積'};
   }
 }
 
@@ -389,7 +399,7 @@ function g6_proportion(){
     while(x2===x1) x2=randInt(1,12);
     const y2=k*x2;
     return {text:`yはxに比例していて、x=${x1}のときy=${y1}です。x=${x2}のときyはいくつ？`, type:'numeric',
-      answer:y2, explain:`比例定数は ${y1}÷${x1}=${k}。y=${k}×${x2}=${y2}`, category:'比例と反比例'};
+      answer:y2, explain:`「yはxに比例する」とは、xがどんな値でも y÷x がいつも同じ数(比例定数)になるということ。まず比例定数を求めると ${y1}÷${x1}=${k}。この${k}は変わらないので、x=${x2}のときも y=${k}×${x2}=${y2}`, category:'比例と反比例'};
   } else {
     const k=randInt(12,60);
     const divisors=[];
@@ -401,7 +411,7 @@ function g6_proportion(){
     while(x2===x1 && tries<10){x2=divisors[randInt(0,divisors.length-1)]; tries++;}
     const y2=k/x2;
     return {text:`yはxに反比例していて、x=${x1}のときy=${y1}です。x=${x2}のときyはいくつ？`, type:'numeric',
-      answer:y2, explain:`きまった数は ${x1}×${y1}=${k}。y=${k}÷${x2}=${y2}`, category:'比例と反比例'};
+      answer:y2, explain:`「yはxに反比例する」とは、xがどんな値でも x×y がいつも同じ数(きまった数)になるということ。まずきまった数を求めると ${x1}×${y1}=${k}。この${k}は変わらないので、x=${x2}のときは y=${k}÷${x2}=${y2}`, category:'比例と反比例'};
   }
 }
 
@@ -410,12 +420,12 @@ function g6_permCombo(){
     const n=randInt(3,4);
     let ans=1; for(let i=1;i<=n;i++) ans*=i;
     return {text:`${n}人を1列に並べる方法は 何通り？`, type:'numeric', answer:ans,
-      explain:`${n}×${n-1}×…×1 = ${ans}通り`, category:'並べ方と組み合わせ方'};
+      explain:`1番目に並ぶ人は${n}通り。2番目は1番目の人を除いた${n-1}通り…というように、選べる人数が1人ずつ減っていく。だから ${n}×${n-1}×…×1 = ${ans}通り`, category:'並べ方と組み合わせ方'};
   } else {
     const n=randInt(4,7);
     const ans = n*(n-1)/2;
     return {text:`${n}人の中から2人を選ぶ方法は 何通り？`, type:'numeric', answer:ans,
-      explain:`${n}×${n-1}÷2 = ${ans}通り`, category:'並べ方と組み合わせ方'};
+      explain:`「並べ方」と違って「組み合わせ」は順番を区別しない(AさんBさんを選ぶのも、BさんAさんを選ぶのも同じ)。1人目の選び方は${n}通り、2人目は${n-1}通りで ${n}×${n-1}通りだが、これは同じ組が2回ずつ数えられているので2で割る。${n}×${n-1}÷2 = ${ans}通り`, category:'並べ方と組み合わせ方'};
   }
 }
 
@@ -429,7 +439,7 @@ function g6_average(){
   const total=nums.reduce((a,b)=>a+b,0);
   const ans= total/count;
   return {text:`${nums.join('、')} の平均は？`, type:'numeric', answer:ans,
-    explain:`合計${total} ÷ ${count}個 = ${ans}`, category:'データの調べ方'};
+    explain:`平均は「全部を足してから、個数で割る」と求められる。まず全部たすと ${nums.join('+')} = ${total}。データは${count}個あるので、${total} ÷ ${count} = ${ans}`, category:'データの調べ方'};
 }
 
 const G6_POOL = [g6_symmetry, g6_letterEq, g6_fracMul, g6_fracDiv,
