@@ -2,18 +2,21 @@
 
 import { useEffect, useState } from "react";
 import type { StatsData } from "@/lib/stats";
+import { authHeaders } from "@/lib/auth-headers";
 
 interface WeaknessScreenProps {
+  username: string;
+  password: string;
   onBack: () => void;
 }
 
-export default function WeaknessScreen({ onBack }: WeaknessScreenProps) {
+export default function WeaknessScreen({ username, password, onBack }: WeaknessScreenProps) {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/stats")
+    fetch("/api/stats", { headers: authHeaders(username, password) })
       .then((res) => res.json())
       .then((data: StatsData) => {
         if (!cancelled) setStats(data);
@@ -24,7 +27,7 @@ export default function WeaknessScreen({ onBack }: WeaknessScreenProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [username, password]);
 
   const rows = stats
     ? Object.entries(stats)

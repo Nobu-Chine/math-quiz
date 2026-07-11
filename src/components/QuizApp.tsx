@@ -5,6 +5,8 @@ import type { Question } from "@/lib/questionBank";
 import { generateNormalQuiz, generateCampQuiz } from "@/lib/quiz-generator";
 import type { AnswerRecord, QuizMode, Screen } from "@/lib/quiz-types";
 import type { QuizResultEntry, StatsData } from "@/lib/stats";
+import { authHeaders } from "@/lib/auth-headers";
+import LoginScreen from "@/components/screens/LoginScreen";
 import TopScreen from "@/components/screens/TopScreen";
 import QuizScreen from "@/components/screens/QuizScreen";
 import ResultScreen from "@/components/screens/ResultScreen";
@@ -13,13 +15,20 @@ import WeaknessScreen from "@/components/screens/WeaknessScreen";
 const QUESTION_COUNT = 10;
 
 export default function QuizApp() {
-  const [screen, setScreen] = useState<Screen>("top");
+  const [screen, setScreen] = useState<Screen>("login");
   const [mode, setMode] = useState<QuizMode>("normal");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [auth, setAuth] = useState<{ username: string; password: string } | null>(null);
+
+  function handleLogin(username: string, password: string) {
+    setAuth({ username, password });
+    setScreen("top");
+  }
 
   async function startQuiz(nextMode: QuizMode) {
+    if (!auth) return;
     setMode(nextMode);
     setAnswers([]);
     setCurrentIndex(0);
@@ -27,7 +36,9 @@ export default function QuizApp() {
     if (nextMode === "camp") {
       setScreen("loading");
       try {
-        const stats: StatsData = await fetch("/api/stats").then((res) => res.json());
+        const stats: StatsData = await fetch("/api/stats", {
+          headers: authHeaders(auth.username, auth.password),
+        }).then((res) => res.json());
         setQuestions(generateCampQuiz(QUESTION_COUNT, stats));
       } catch {
         setQuestions(generateNormalQuiz(QUESTION_COUNT));
@@ -39,6 +50,7 @@ export default function QuizApp() {
   }
 
   function submitResults(records: AnswerRecord[]) {
+    if (!auth) return;
     const results: QuizResultEntry[] = records.map((r) => ({
       category: r.question.category,
       correct: r.correct,
@@ -46,7 +58,7 @@ export default function QuizApp() {
     fetch("/api/stats", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ results }),
+      body: JSON.stringify({ username: auth.username, password: auth.password, results }),
     }).catch(() => {});
   }
 
@@ -65,6 +77,7 @@ export default function QuizApp() {
   return (
     <div className="flex min-h-dvh w-full flex-col items-center bg-gradient-to-b from-sky-100 via-violet-100 to-rose-100 px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]">
       <div className="flex w-full max-w-md flex-1 flex-col">
+        {screen === "login" && <LoginScreen onLogin={handleLogin} />}
         {screen === "top" && (
           <TopScreen
             onStart={() => startQuiz("normal")}
@@ -96,7 +109,13 @@ export default function QuizApp() {
             onShowWeakness={() => setScreen("weakness")}
           />
         )}
-        {screen === "weakness" && <WeaknessScreen onBack={() => setScreen("top")} />}
+        {screen === "weakness" && auth && (
+          <WeaknessScreen
+            username={auth.username}
+            password={auth.password}
+            onBack={() => setScreen("top")}
+          />
+        )}
       </div>
     </div>
   );
