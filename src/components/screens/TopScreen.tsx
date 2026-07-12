@@ -20,11 +20,12 @@ export default function TopScreen({
       <div>
         <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-700">算数ふくしゅうクイズ</h1>
-        <p className="mt-4 text-lg font-bold text-slate-700">
-          練習でうでをみがいて、合宿でにがてを克服!
-        </p>
-        <p className="mt-1 text-base font-semibold text-slate-600">
-          カテゴリを制覇したら、卒業テストに挑戦しよう
+        <p className="mt-4 text-base font-bold leading-relaxed text-slate-700">
+          練習問題をこなして力をつけ
+          <br />
+          合宿モードで苦手を克服
+          <br />
+          カテゴリ制覇し、卒業テストに挑戦しよう！
         </p>
       </div>
       <div className="flex w-full flex-col gap-4">
