@@ -60,7 +60,7 @@ export default function WeaknessScreen({ username, password, onBack }: WeaknessS
               <div className="flex items-center justify-between text-sm">
                 <span className="font-semibold text-slate-700">{row.category}</span>
                 <span className="text-slate-500">
-                  {row.correct}/{row.attempts}問 ({Math.round(row.accuracy * 100)}%)
+                  {row.correct}/{row.attempts}問 正解(正解率{Math.round(row.accuracy * 100)}%)
                 </span>
               </div>
               <div className="mt-2 h-3 w-full rounded-full bg-slate-100">
