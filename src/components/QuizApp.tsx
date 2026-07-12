@@ -204,9 +204,12 @@ export default function QuizApp() {
             totalQuestions={questions.length}
             mode={mode}
             onNext={handleAnswerNext}
+            onBack={() => setScreen("top")}
           />
         )}
-        {screen === "streak" && <StreakScreen onFinish={handleStreakFinish} />}
+        {screen === "streak" && (
+          <StreakScreen onFinish={handleStreakFinish} onBack={() => setScreen("top")} />
+        )}
         {screen === "streak-result" && (
           <StreakResultScreen
             streak={streakResult.streak}

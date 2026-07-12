@@ -30,14 +30,19 @@ export default function TopScreen({
           onClick={onStart}
           className="w-full rounded-2xl bg-violet-500 py-5 text-xl font-bold text-white shadow-lg shadow-violet-200 transition-transform active:scale-95"
         >
-          スタート
+          練習問題
         </button>
-        <button
-          onClick={onStartCamp}
-          className="w-full rounded-2xl bg-orange-400 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-transform active:scale-95"
-        >
-          🏕️ 合宿モード(にがて集中)
-        </button>
+        <div>
+          <button
+            onClick={onStartCamp}
+            className="w-full rounded-2xl bg-orange-400 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-transform active:scale-95"
+          >
+            🏕️ 合宿モード(にがて集中)
+          </button>
+          <p className="mt-1 text-xs text-slate-400">
+            これまでの記録から、にがてなカテゴリを自動で選んで出題するよ
+          </p>
+        </div>
         <button
           onClick={onShowCategorySelect}
           className="w-full rounded-2xl bg-emerald-400 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"

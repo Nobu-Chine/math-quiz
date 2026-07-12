@@ -8,9 +8,10 @@ import type { AnswerRecord } from "@/lib/quiz-types";
 
 interface StreakScreenProps {
   onFinish: (streak: number, records: AnswerRecord[]) => void;
+  onBack: () => void;
 }
 
-export default function StreakScreen({ onFinish }: StreakScreenProps) {
+export default function StreakScreen({ onFinish, onBack }: StreakScreenProps) {
   const [question, setQuestion] = useState<Question>(() => generateQuestion());
   const [streak, setStreak] = useState(0);
   const [records, setRecords] = useState<AnswerRecord[]>([]);
@@ -48,6 +49,12 @@ export default function StreakScreen({ onFinish }: StreakScreenProps) {
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div>
+        <button
+          onClick={onBack}
+          className="mb-2 block text-sm font-semibold text-slate-400 active:text-slate-500"
+        >
+          ← やめる
+        </button>
         <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
           🔥 連続回答モード
         </p>

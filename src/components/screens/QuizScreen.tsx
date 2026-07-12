@@ -11,6 +11,7 @@ interface QuizScreenProps {
   totalQuestions: number;
   mode: QuizMode;
   onNext: (record: AnswerRecord) => void;
+  onBack: () => void;
 }
 
 export default function QuizScreen({
@@ -19,6 +20,7 @@ export default function QuizScreen({
   totalQuestions,
   mode,
   onNext,
+  onBack,
 }: QuizScreenProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [numericInput, setNumericInput] = useState("");
@@ -42,6 +44,12 @@ export default function QuizScreen({
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div>
+        <button
+          onClick={onBack}
+          className="mb-2 text-sm font-semibold text-slate-400 active:text-slate-500"
+        >
+          ← やめる
+        </button>
         {mode === "camp" && (
           <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
             🏕️ 合宿モード
