@@ -1,16 +1,29 @@
+import Link from "next/link";
+
 interface TopScreenProps {
   onStart: () => void;
   onStartCamp: () => void;
+  onShowCategorySelect: () => void;
+  onStartStreak: () => void;
   onShowWeakness: () => void;
 }
 
-export default function TopScreen({ onStart, onStartCamp, onShowWeakness }: TopScreenProps) {
+export default function TopScreen({
+  onStart,
+  onStartCamp,
+  onShowCategorySelect,
+  onStartStreak,
+  onShowWeakness,
+}: TopScreenProps) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-10 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">
       <div>
         <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-700">算数ふくしゅうクイズ</h1>
         <p className="mt-3 text-slate-500">5問チャレンジして、にがてを見つけよう</p>
+        <p className="mt-2 text-xs text-slate-400">
+          カテゴリテストで全問正解するとクリア、全カテゴリクリアで卒業テスト(15問)に挑戦できるよ
+        </p>
       </div>
       <div className="flex w-full flex-col gap-4">
         <button
@@ -26,11 +39,31 @@ export default function TopScreen({ onStart, onStartCamp, onShowWeakness }: TopS
           🏕️ 合宿モード(にがて集中)
         </button>
         <button
+          onClick={onShowCategorySelect}
+          className="w-full rounded-2xl bg-emerald-400 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"
+        >
+          🗂️ カテゴリ別に挑戦
+        </button>
+        <button
+          onClick={onStartStreak}
+          className="w-full rounded-2xl bg-rose-400 py-4 text-lg font-bold text-white shadow-lg shadow-rose-200 transition-transform active:scale-95"
+        >
+          🔥 連続回答モード
+        </button>
+        <button
           onClick={onShowWeakness}
           className="w-full rounded-2xl bg-white py-4 text-lg font-semibold text-violet-500 shadow-md transition-transform active:scale-95"
         >
           📊 にがてぶんやを見る
         </button>
+        <div className="flex gap-3 text-sm font-semibold text-violet-500">
+          <Link href="/graduates" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
+            🎓 卒業生リスト
+          </Link>
+          <Link href="/ranking" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
+            🏆 ランキング
+          </Link>
+        </div>
       </div>
     </div>
   );

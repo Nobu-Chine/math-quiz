@@ -63,3 +63,24 @@ export function generateCampQuiz(count: number, stats: StatsData): Question[] {
   const maxPerCategory = Math.max(1, Math.ceil(count / weakSet.size));
   return sampleQuiz(count, maxPerCategory, (category) => weakSet.has(category));
 }
+
+// カテゴリテストモード: 指定した1カテゴリのみで出題する
+export function generateCategoryQuiz(category: string, count = 10): Question[] {
+  return sampleQuiz(count, count, (c) => c === category);
+}
+
+// 卒業テスト: 全カテゴリからできるだけ均等に出題する
+export function generateGraduationQuiz(count = 15): Question[] {
+  const base = Math.floor(count / CATEGORIES.length);
+  const remainder = count % CATEGORIES.length;
+  const bonusCategories = new Set(shuffle(CATEGORIES).slice(0, remainder));
+
+  const result: Question[] = [];
+  for (const category of CATEGORIES) {
+    const quota = base + (bonusCategories.has(category) ? 1 : 0);
+    if (quota > 0) {
+      result.push(...sampleQuiz(quota, quota, (c) => c === category));
+    }
+  }
+  return shuffle(result);
+}

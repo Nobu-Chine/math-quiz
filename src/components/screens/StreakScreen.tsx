@@ -2,24 +2,18 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/questionBank";
+import { generateQuestion } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
-import type { AnswerRecord, QuizMode } from "@/lib/quiz-types";
+import type { AnswerRecord } from "@/lib/quiz-types";
 
-interface QuizScreenProps {
-  question: Question;
-  questionNumber: number;
-  totalQuestions: number;
-  mode: QuizMode;
-  onNext: (record: AnswerRecord) => void;
+interface StreakScreenProps {
+  onFinish: (streak: number, records: AnswerRecord[]) => void;
 }
 
-export default function QuizScreen({
-  question,
-  questionNumber,
-  totalQuestions,
-  mode,
-  onNext,
-}: QuizScreenProps) {
+export default function StreakScreen({ onFinish }: StreakScreenProps) {
+  const [question, setQuestion] = useState<Question>(() => generateQuestion());
+  const [streak, setStreak] = useState(0);
+  const [records, setRecords] = useState<AnswerRecord[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [numericInput, setNumericInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -34,40 +28,32 @@ export default function QuizScreen({
   }
 
   function handleNext() {
-    onNext({ question, userAnswer: currentAnswer, correct });
-  }
+    const record: AnswerRecord = { question, userAnswer: currentAnswer, correct };
+    const nextRecords = [...records, record];
 
-  const progress = (questionNumber / totalQuestions) * 100;
+    if (!correct) {
+      onFinish(streak, nextRecords);
+      return;
+    }
+
+    setRecords(nextRecords);
+    setStreak((s) => s + 1);
+    setQuestion(generateQuestion());
+    setSelected(null);
+    setNumericInput("");
+    setSubmitted(false);
+    setCorrect(false);
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div>
-        {mode === "camp" && (
-          <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
-            🏕️ 合宿モード
-          </p>
-        )}
-        {mode === "category" && (
-          <p className="mb-2 inline-block rounded-full bg-emerald-400 px-3 py-1 text-xs font-bold text-white">
-            🗂️ カテゴリテスト
-          </p>
-        )}
-        {mode === "graduation" && (
-          <p className="mb-2 inline-block rounded-full bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">
-            🎓 卒業テスト
-          </p>
-        )}
+        <p className="mb-2 inline-block rounded-full bg-orange-400 px-3 py-1 text-xs font-bold text-white">
+          🔥 連続回答モード
+        </p>
         <div className="flex items-center justify-between text-sm font-semibold text-slate-500">
-          <span>
-            もんだい {questionNumber} / {totalQuestions}
-          </span>
+          <span>れんぞく正解: {streak}</span>
           <span className="text-violet-500">{question.category}</span>
-        </div>
-        <div className="mt-2 h-2 w-full rounded-full bg-white/70">
-          <div
-            className="h-2 rounded-full bg-violet-400 transition-all"
-            style={{ width: `${progress}%` }}
-          />
         </div>
       </div>
 
@@ -119,7 +105,7 @@ export default function QuizScreen({
       {submitted && (
         <div className={`rounded-3xl p-6 shadow-md ${correct ? "bg-emerald-50" : "bg-rose-50"}`}>
           <p className={`text-xl font-bold ${correct ? "text-emerald-600" : "text-rose-600"}`}>
-            {correct ? "せいかい！ 🎉" : "ざんねん…"}
+            {correct ? "せいかい! 🎉" : "ざんねん…"}
           </p>
           {!correct && (
             <p className="mt-1 text-slate-600">
@@ -131,7 +117,7 @@ export default function QuizScreen({
             onClick={handleNext}
             className="mt-5 w-full rounded-2xl bg-violet-500 py-4 text-lg font-bold text-white shadow-lg shadow-violet-200 transition-transform active:scale-95"
           >
-            {questionNumber === totalQuestions ? "結果を見る" : "次の問題へ"}
+            {correct ? "次の問題へ" : "けっかを見る"}
           </button>
         </div>
       )}

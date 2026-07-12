@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/questionBank";
-import { generateNormalQuiz, generateCampQuiz } from "@/lib/quiz-generator";
+import {
+  generateNormalQuiz,
+  generateCampQuiz,
+  generateCategoryQuiz,
+  generateGraduationQuiz,
+} from "@/lib/quiz-generator";
 import type { AnswerRecord, QuizMode, Screen } from "@/lib/quiz-types";
 import type { QuizResultEntry, StatsData } from "@/lib/stats";
 import { authHeaders } from "@/lib/auth-headers";
@@ -11,8 +16,19 @@ import TopScreen from "@/components/screens/TopScreen";
 import QuizScreen from "@/components/screens/QuizScreen";
 import ResultScreen from "@/components/screens/ResultScreen";
 import WeaknessScreen from "@/components/screens/WeaknessScreen";
+import CategorySelectScreen from "@/components/screens/CategorySelectScreen";
+import StreakScreen from "@/components/screens/StreakScreen";
+import StreakResultScreen from "@/components/screens/StreakResultScreen";
 
 const QUESTION_COUNT = 5;
+const CATEGORY_QUESTION_COUNT = 10;
+const GRADUATION_QUESTION_COUNT = 15;
+
+interface StreakResult {
+  streak: number;
+  bestStreak: number;
+  newBest: boolean;
+}
 
 export default function QuizApp() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -21,15 +37,37 @@ export default function QuizApp() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [auth, setAuth] = useState<{ username: string; password: string } | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [streakResult, setStreakResult] = useState<StreakResult>({
+    streak: 0,
+    bestStreak: 0,
+    newBest: false,
+  });
 
   function handleLogin(username: string, password: string) {
     setAuth({ username, password });
     setScreen("top");
   }
 
+  function postProgress(body: {
+    categoryClear?: string;
+    graduate?: boolean;
+    streak?: number;
+  }): Promise<{ bestStreak: number; newBest: boolean } | null> {
+    if (!auth) return Promise.resolve(null);
+    return fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: auth.username, password: auth.password, ...body }),
+    })
+      .then((res) => res.json())
+      .catch(() => null);
+  }
+
   async function startQuiz(nextMode: QuizMode) {
     if (!auth) return;
     setMode(nextMode);
+    setActiveCategory(null);
     setAnswers([]);
     setCurrentIndex(0);
 
@@ -47,6 +85,45 @@ export default function QuizApp() {
       setQuestions(generateNormalQuiz(QUESTION_COUNT));
     }
     setScreen("quiz");
+  }
+
+  function startCategoryQuiz(category: string) {
+    if (!auth) return;
+    setMode("category");
+    setActiveCategory(category);
+    setAnswers([]);
+    setCurrentIndex(0);
+    setQuestions(generateCategoryQuiz(category, CATEGORY_QUESTION_COUNT));
+    setScreen("quiz");
+  }
+
+  function startGraduationQuiz() {
+    if (!auth) return;
+    setMode("graduation");
+    setActiveCategory(null);
+    setAnswers([]);
+    setCurrentIndex(0);
+    setQuestions(generateGraduationQuiz(GRADUATION_QUESTION_COUNT));
+    setScreen("quiz");
+  }
+
+  function startStreak() {
+    if (!auth) return;
+    setMode("streak");
+    setActiveCategory(null);
+    setScreen("streak");
+  }
+
+  function restartCurrent() {
+    if (mode === "category" && activeCategory) {
+      startCategoryQuiz(activeCategory);
+    } else if (mode === "graduation") {
+      startGraduationQuiz();
+    } else if (mode === "streak") {
+      startStreak();
+    } else {
+      startQuiz(mode);
+    }
   }
 
   function submitResults(records: AnswerRecord[]) {
@@ -68,10 +145,27 @@ export default function QuizApp() {
 
     if (currentIndex + 1 >= questions.length) {
       submitResults(nextAnswers);
+      const perfect = nextAnswers.length > 0 && nextAnswers.every((a) => a.correct);
+      if (mode === "category" && activeCategory && perfect) {
+        postProgress({ categoryClear: activeCategory });
+      } else if (mode === "graduation" && perfect) {
+        postProgress({ graduate: true });
+      }
       setScreen("result");
     } else {
       setCurrentIndex(currentIndex + 1);
     }
+  }
+
+  async function handleStreakFinish(streak: number, records: AnswerRecord[]) {
+    submitResults(records);
+    const result = await postProgress({ streak });
+    setStreakResult({
+      streak,
+      bestStreak: result?.bestStreak ?? streak,
+      newBest: result?.newBest ?? false,
+    });
+    setScreen("streak-result");
   }
 
   return (
@@ -82,6 +176,8 @@ export default function QuizApp() {
           <TopScreen
             onStart={() => startQuiz("normal")}
             onStartCamp={() => startQuiz("camp")}
+            onShowCategorySelect={() => setScreen("category-select")}
+            onStartStreak={startStreak}
             onShowWeakness={() => setScreen("weakness")}
           />
         )}
@@ -90,6 +186,15 @@ export default function QuizApp() {
             <p className="text-4xl">🏕️</p>
             <p className="font-semibold text-slate-600">にがてぶんやをチェック中…</p>
           </div>
+        )}
+        {screen === "category-select" && auth && (
+          <CategorySelectScreen
+            username={auth.username}
+            password={auth.password}
+            onSelectCategory={startCategoryQuiz}
+            onStartGraduation={startGraduationQuiz}
+            onBack={() => setScreen("top")}
+          />
         )}
         {screen === "quiz" && questions[currentIndex] && (
           <QuizScreen
@@ -101,11 +206,22 @@ export default function QuizApp() {
             onNext={handleAnswerNext}
           />
         )}
+        {screen === "streak" && <StreakScreen onFinish={handleStreakFinish} />}
+        {screen === "streak-result" && (
+          <StreakResultScreen
+            streak={streakResult.streak}
+            bestStreak={streakResult.bestStreak}
+            newBest={streakResult.newBest}
+            onRestart={startStreak}
+            onBackToTop={() => setScreen("top")}
+          />
+        )}
         {screen === "result" && (
           <ResultScreen
             answers={answers}
             mode={mode}
-            onRestart={() => startQuiz(mode)}
+            category={activeCategory}
+            onRestart={restartCurrent}
             onShowWeakness={() => setScreen("weakness")}
           />
         )}

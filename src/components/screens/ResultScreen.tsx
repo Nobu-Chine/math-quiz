@@ -4,15 +4,23 @@ import { calcRank, RANK_COLORS } from "@/lib/rank";
 interface ResultScreenProps {
   answers: AnswerRecord[];
   mode: QuizMode;
+  category?: string | null;
   onRestart: () => void;
   onShowWeakness: () => void;
 }
 
-export default function ResultScreen({ answers, mode, onRestart, onShowWeakness }: ResultScreenProps) {
+export default function ResultScreen({
+  answers,
+  mode,
+  category,
+  onRestart,
+  onShowWeakness,
+}: ResultScreenProps) {
   const total = answers.length;
   const score = answers.filter((a) => a.correct).length;
   const rank = calcRank(score, total);
   const wrongAnswers = answers.filter((a) => !a.correct);
+  const perfect = total > 0 && score === total;
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -22,11 +30,30 @@ export default function ResultScreen({ answers, mode, onRestart, onShowWeakness 
             🏕️ 合宿モード
           </p>
         )}
+        {mode === "category" && (
+          <p className="mb-2 inline-block rounded-full bg-emerald-400 px-3 py-1 text-xs font-bold text-white">
+            🗂️ カテゴリテスト{category ? `: ${category}` : ""}
+          </p>
+        )}
+        {mode === "graduation" && (
+          <p className="mb-2 inline-block rounded-full bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">
+            🎓 卒業テスト
+          </p>
+        )}
         <p className="text-slate-500">けっか</p>
         <p className="mt-2 text-5xl font-extrabold text-slate-700">
           {score} <span className="text-2xl font-semibold text-slate-400">/ {total}</span>
         </p>
         <p className={`mt-3 text-4xl font-black ${RANK_COLORS[rank]}`}>{rank}</p>
+        {mode === "category" && perfect && (
+          <p className="mt-3 text-lg font-black text-emerald-500">🎉 カテゴリクリア!</p>
+        )}
+        {mode === "graduation" && perfect && (
+          <p className="mt-3 text-lg font-black text-fuchsia-500">🎓 卒業おめでとう!</p>
+        )}
+        {mode === "graduation" && !perfect && (
+          <p className="mt-3 text-sm font-semibold text-rose-500">不合格(何度でも再挑戦できるよ)</p>
+        )}
       </div>
 
       {wrongAnswers.length > 0 && (
