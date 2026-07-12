@@ -20,9 +20,11 @@ export default function TopScreen({
       <div>
         <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-700">算数ふくしゅうクイズ</h1>
-        <p className="mt-3 text-slate-500">5問チャレンジして、にがてを見つけよう</p>
-        <p className="mt-2 text-xs text-slate-400">
-          カテゴリテストで全問正解するとクリア、全カテゴリクリアで卒業テスト(15問)に挑戦できるよ
+        <p className="mt-4 text-lg font-bold text-slate-700">
+          練習でうでをみがいて、合宿でにがてを克服!
+        </p>
+        <p className="mt-1 text-base font-semibold text-slate-600">
+          カテゴリを制覇したら、卒業テストに挑戦しよう
         </p>
       </div>
       <div className="flex w-full flex-col gap-4">
@@ -37,7 +39,7 @@ export default function TopScreen({
             onClick={onStartCamp}
             className="w-full rounded-2xl bg-orange-400 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-transform active:scale-95"
           >
-            🏕️ 合宿モード(にがて集中)
+            合宿モード
           </button>
           <p className="mt-1 text-xs text-slate-400">
             これまでの記録から、にがてなカテゴリを自動で選んで出題するよ
@@ -47,26 +49,31 @@ export default function TopScreen({
           onClick={onShowCategorySelect}
           className="w-full rounded-2xl bg-emerald-400 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"
         >
-          🗂️ カテゴリ別に挑戦
+          カテゴリ別に挑戦
         </button>
-        <button
-          onClick={onStartStreak}
-          className="w-full rounded-2xl bg-rose-400 py-4 text-lg font-bold text-white shadow-lg shadow-rose-200 transition-transform active:scale-95"
-        >
-          🔥 連続回答モード
-        </button>
+        <div>
+          <button
+            onClick={onStartStreak}
+            className="w-full rounded-2xl bg-rose-400 py-4 text-lg font-bold text-white shadow-lg shadow-rose-200 transition-transform active:scale-95"
+          >
+            連続回答モード
+          </button>
+          <p className="mt-1 text-xs text-slate-400">
+            1問でも間違えたら終了。何問連続で正解できるか挑戦しよう
+          </p>
+        </div>
         <button
           onClick={onShowWeakness}
           className="w-full rounded-2xl bg-white py-4 text-lg font-semibold text-violet-500 shadow-md transition-transform active:scale-95"
         >
-          📊 にがてぶんやを見る
+          にがてぶんやを見る
         </button>
         <div className="flex gap-3 text-sm font-semibold text-violet-500">
           <Link href="/graduates" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
-            🎓 卒業生リスト
+            卒業生リスト
           </Link>
           <Link href="/ranking" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
-            🏆 ランキング
+            ランキング
           </Link>
         </div>
       </div>

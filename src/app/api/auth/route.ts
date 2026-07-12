@@ -41,7 +41,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!(await verifyPassword(password, existingHash))) {
-    return NextResponse.json({ error: "パスワードが違います" }, { status: 401 });
+    return NextResponse.json(
+      {
+        error:
+          "そのユーザー名はすでに使われています。別のユーザー名にするか、パスワードを確認してください",
+      },
+      { status: 401 }
+    );
   }
 
   return NextResponse.json({ success: true, isNewUser: false });

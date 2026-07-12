@@ -54,7 +54,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="ユーザー名"
-          autoComplete="username"
+          autoComplete="off"
+          data-1p-ignore
+          data-lpignore="true"
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-lg text-slate-700 shadow-sm outline-none focus:border-violet-400"
         />
         <input
@@ -62,7 +64,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="パスワード"
-          autoComplete="current-password"
+          autoComplete="new-password"
+          data-1p-ignore
+          data-lpignore="true"
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-lg text-slate-700 shadow-sm outline-none focus:border-violet-400"
         />
         {error && <p className="text-sm font-semibold text-rose-500">{error}</p>}
