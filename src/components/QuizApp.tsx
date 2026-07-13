@@ -11,7 +11,8 @@ import {
 import type { AnswerRecord, QuizMode, Screen } from "@/lib/quiz-types";
 import type { QuizResultEntry, StatsData } from "@/lib/stats";
 import { authHeaders } from "@/lib/auth-headers";
-import LoginScreen from "@/components/screens/LoginScreen";
+import { useAuth } from "@/context/AuthContext";
+import LoginForm from "@/components/LoginForm";
 import TopScreen from "@/components/screens/TopScreen";
 import QuizScreen from "@/components/screens/QuizScreen";
 import ResultScreen from "@/components/screens/ResultScreen";
@@ -31,23 +32,18 @@ interface StreakResult {
 }
 
 export default function QuizApp() {
-  const [screen, setScreen] = useState<Screen>("login");
+  const { auth, ready } = useAuth();
+  const [screen, setScreen] = useState<Screen>("top");
   const [mode, setMode] = useState<QuizMode>("normal");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
-  const [auth, setAuth] = useState<{ username: string; password: string } | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [streakResult, setStreakResult] = useState<StreakResult>({
     streak: 0,
     bestStreak: 0,
     newBest: false,
   });
-
-  function handleLogin(username: string, password: string) {
-    setAuth({ username, password });
-    setScreen("top");
-  }
 
   function postProgress(body: {
     categoryClear?: string;
@@ -168,10 +164,21 @@ export default function QuizApp() {
     setScreen("streak-result");
   }
 
+  if (!ready) return null;
+
+  if (!auth) {
+    return (
+      <div className="flex min-h-dvh w-full flex-col items-center bg-gradient-to-b from-sky-100 via-violet-100 to-rose-100 px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]">
+        <div className="flex w-full max-w-md flex-1 flex-col">
+          <LoginForm />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-dvh w-full flex-col items-center bg-gradient-to-b from-sky-100 via-violet-100 to-rose-100 px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]">
       <div className="flex w-full max-w-md flex-1 flex-col">
-        {screen === "login" && <LoginScreen onLogin={handleLogin} />}
         {screen === "top" && (
           <TopScreen
             onStart={() => startQuiz("normal")}

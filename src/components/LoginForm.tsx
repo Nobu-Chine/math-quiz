@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
-interface LoginScreenProps {
-  onLogin: (username: string, password: string) => void;
-}
-
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
+export default function LoginForm() {
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +31,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         setError(data.error ?? "ログインに失敗しました");
         return;
       }
-      onLogin(name, password);
+      login(name, password);
     } catch {
       setError("通信エラーが発生しました");
     } finally {
@@ -45,8 +43,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     <div className="flex flex-1 flex-col items-center justify-center gap-10 text-center">
       <div>
         <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-700">算数ふくしゅうクイズ</h1>
+        <h1 className="mt-2 text-3xl font-bold text-slate-700">クイズポータル</h1>
         <p className="mt-3 text-slate-500">ユーザー名でログイン(初回は自動登録)</p>
+        <p className="mt-2 text-xs text-slate-400">
+          同じユーザー名は1人しか使えません。ログインでエラーになったら、その名前はもう他の人が使っているということです。
+        </p>
       </div>
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
         <input

@@ -1,11 +1,8 @@
-import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 import type { QuizResultEntry, StatsData } from "@/lib/stats";
-import { verifyPassword } from "@/lib/auth";
+import { redis } from "@/lib/redis";
+import { authenticate, credentialsFromHeaders } from "@/lib/auth-check";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
-
-const redis = Redis.fromEnv();
-const USERS_KEY = "math-quiz:users";
 
 function statsKey(username: string) {
   return `math-quiz:stats:${username}`;
@@ -23,23 +20,6 @@ function parseStats(raw: Record<string, number> | null): StatsData {
     stats[category][kind] = Number(value);
   }
   return stats;
-}
-
-async function authenticate(username: string, password: string) {
-  const hash = await redis.hget<string>(USERS_KEY, username);
-  if (!hash) return false;
-  return verifyPassword(password, hash);
-}
-
-function credentialsFromHeaders(request: NextRequest): { username: string; password: string } | null {
-  const username = request.headers.get("x-username");
-  const password = request.headers.get("x-password");
-  if (!username || !password) return null;
-  try {
-    return { username: decodeURIComponent(username), password: decodeURIComponent(password) };
-  } catch {
-    return null;
-  }
 }
 
 export async function POST(request: NextRequest) {

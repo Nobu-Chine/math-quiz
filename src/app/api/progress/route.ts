@@ -1,27 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis, clearsKey, GRADUATES_KEY, STREAK_BEST_KEY } from "@/lib/redis";
 import { CATEGORIES } from "@/lib/questionBank";
-import { verifyPassword } from "@/lib/auth";
+import { authenticate, credentialsFromHeaders } from "@/lib/auth-check";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
-
-const USERS_KEY = "math-quiz:users";
-
-async function authenticate(username: string, password: string) {
-  const hash = await redis.hget<string>(USERS_KEY, username);
-  if (!hash) return false;
-  return verifyPassword(password, hash);
-}
-
-function credentialsFromHeaders(request: NextRequest): { username: string; password: string } | null {
-  const username = request.headers.get("x-username");
-  const password = request.headers.get("x-password");
-  if (!username || !password) return null;
-  try {
-    return { username: decodeURIComponent(username), password: decodeURIComponent(password) };
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(request: NextRequest) {
   const allowed = await checkRateLimit(`ratelimit:progress:${clientIp(request)}`, 30, 60);

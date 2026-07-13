@@ -7,7 +7,6 @@ export interface AnswerRecord {
 }
 
 export type Screen =
-  | "login"
   | "top"
   | "loading"
   | "quiz"

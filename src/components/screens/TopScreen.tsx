@@ -19,7 +19,7 @@ export default function TopScreen({
     <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">
       <div>
         <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-700">算数ふくしゅうクイズ</h1>
+        <h1 className="mt-2 text-3xl font-bold text-slate-700">算数クイズ</h1>
         <p className="mt-4 text-base font-bold leading-relaxed text-slate-700">
           練習問題をこなして力をつけ
           <br />

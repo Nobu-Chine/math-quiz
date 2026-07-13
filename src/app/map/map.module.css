@@ -1,0 +1,350 @@
+/* okinawa_map_complete.html のスタイルを移設(オーシャンテーマ) */
+
+.root {
+  --ocean-dark: #0a2540;
+  --ocean: #12406b;
+  --ocean-light: #4fb3d9;
+  --gold: #ffd166;
+  --coral: #ff6b6b;
+  --leaf: #4caf7d;
+  background: linear-gradient(160deg, var(--ocean-dark), var(--ocean) 60%, #0d3355);
+  color: #fff;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== スタート・結果画面 ===== */
+.centerPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 44px 20px 32px;
+  width: 100%;
+}
+.deco {
+  font-size: 44px;
+  margin-bottom: 6px;
+}
+.title {
+  font-size: 26px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+.title span {
+  color: var(--gold);
+}
+.lead {
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 340px;
+  margin: 0 0 26px;
+}
+.btnPrimary {
+  background: linear-gradient(135deg, var(--gold), #ffb347);
+  color: #3a2400;
+  border: none;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 800;
+  padding: 15px 46px;
+  box-shadow: 0 8px 20px rgba(255, 209, 102, 0.35);
+  cursor: pointer;
+}
+.btnPrimary:active {
+  transform: scale(0.97);
+}
+.btnSecondary {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 30px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+.progressBadge {
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 22px;
+  border-radius: 999px;
+}
+.gradBadge {
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--gold), #ffb347);
+  color: #3a2400;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 9px 24px;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(255, 209, 102, 0.3);
+}
+
+/* ===== ゲーム画面 ===== */
+.gamePage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 32px; /* SiteHeaderの帯ぶんを確保 */
+}
+.gameHeader {
+  flex: 0 0 auto;
+  z-index: 20;
+  background: rgba(10, 37, 64, 0.92);
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.hudRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.brand {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+}
+.brand b {
+  color: #fff;
+  font-size: 11px;
+  margin-left: 3px;
+}
+.hud {
+  display: flex;
+  gap: 6px;
+}
+.chip {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.chip .v,
+.chipVal {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.progressTrack {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--leaf), var(--ocean-light));
+  width: 0%;
+  transition: width 0.35s ease;
+}
+
+.statusLine {
+  flex: 0 0 auto;
+  padding: 6px 14px 4px;
+  text-align: center;
+  min-height: 34px;
+}
+.idleMsg {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.activeLbl {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  display: block;
+}
+.activeName {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--gold);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.feedback {
+  position: fixed;
+  top: 44px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  padding: 10px 26px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 50;
+  white-space: nowrap;
+}
+.feedbackShow {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.feedbackOk {
+  background: var(--leaf);
+  color: #fff;
+}
+.feedbackNg {
+  background: var(--coral);
+  color: #fff;
+}
+
+.mapWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 6px;
+  overflow: hidden;
+}
+.mapSvg {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+}
+.muniPath {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.4;
+  cursor: pointer;
+  transition: fill 0.25s ease;
+}
+.muniPath:active {
+  fill: rgba(255, 255, 255, 0.2);
+}
+.muniDone {
+  fill: var(--leaf);
+  stroke: rgba(255, 255, 255, 0.85);
+  cursor: default;
+}
+.muniWrong {
+  fill: var(--coral) !important;
+}
+.muniLabel {
+  font-size: 11px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.muniLabelShow {
+  opacity: 1;
+}
+
+.picker {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  max-height: 32dvh;
+  overflow-y: auto;
+}
+.pickerLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.pickerGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+.nameBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 10px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.nameBtnSelected {
+  background: var(--gold);
+  color: #3a2400;
+  border-color: var(--gold);
+}
+.nameBtn:active {
+  transform: scale(0.96);
+}
+
+/* ===== 結果画面 ===== */
+.rankBadge {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ocean-dark);
+  background: linear-gradient(135deg, var(--gold), #ffb347);
+  border-radius: 999px;
+  padding: 8px 26px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 16px rgba(255, 209, 102, 0.3);
+}
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.statCard {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 22px;
+  min-width: 96px;
+}
+.statNum {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.statLbl {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+/* 未ログイン時のログインフォームを乗せる白カード */
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
