@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Question } from "@/lib/questionBank";
 import { generateQuestion as generateMathQuestion } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
 import type { AnswerRecord } from "@/lib/quiz-types";
+
+function shuffle<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 interface StreakScreenProps {
   onFinish: (streak: number, records: AnswerRecord[]) => void;
@@ -24,6 +33,12 @@ export default function StreakScreen({
   const [numericInput, setNumericInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [correct, setCorrect] = useState(false);
+
+  // 選択肢データ内での正解の位置に関わらず、毎回ランダムな順番で表示する
+  const displayChoices = useMemo(
+    () => (question.choices ? shuffle(question.choices) : undefined),
+    [question]
+  );
 
   const currentAnswer = question.type === "choice" ? selected ?? "" : numericInput;
 
@@ -77,7 +92,7 @@ export default function StreakScreen({
 
       {!submitted && question.type === "choice" && (
         <div className="grid grid-cols-1 gap-3">
-          {question.choices?.map((choice) => (
+          {displayChoices?.map((choice) => (
             <button
               key={choice}
               onClick={() => setSelected(choice)}
