@@ -6,6 +6,11 @@ interface TopScreenProps {
   onShowCategorySelect: () => void;
   onStartStreak: () => void;
   onShowWeakness: () => void;
+  gradeLabel?: string;
+  title?: string;
+  description?: string;
+  graduatesHref?: string;
+  rankingHref?: string;
 }
 
 export default function TopScreen({
@@ -14,18 +19,19 @@ export default function TopScreen({
   onShowCategorySelect,
   onStartStreak,
   onShowWeakness,
+  gradeLabel = "6年生",
+  title = "算数クイズ",
+  description = "練習問題をこなして力をつけ\n合宿モードで苦手を克服\nカテゴリ制覇し、卒業テストに挑戦しよう！",
+  graduatesHref = "/graduates",
+  rankingHref = "/ranking",
 }: TopScreenProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">
       <div>
-        <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-700">算数クイズ</h1>
-        <p className="mt-4 text-base font-bold leading-relaxed text-slate-700">
-          練習問題をこなして力をつけ
-          <br />
-          合宿モードで苦手を克服
-          <br />
-          カテゴリ制覇し、卒業テストに挑戦しよう！
+        <p className="text-sm font-semibold tracking-wide text-violet-500">{gradeLabel}</p>
+        <h1 className="mt-2 text-3xl font-bold text-slate-700">{title}</h1>
+        <p className="mt-4 whitespace-pre-line text-base font-bold leading-relaxed text-slate-700">
+          {description}
         </p>
       </div>
       <div className="flex w-full flex-col gap-4">
@@ -70,10 +76,10 @@ export default function TopScreen({
           にがてぶんやを見る
         </button>
         <div className="flex gap-3 text-sm font-semibold text-violet-500">
-          <Link href="/graduates" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
+          <Link href={graduatesHref} className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
             卒業生リスト
           </Link>
-          <Link href="/ranking" className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
+          <Link href={rankingHref} className="flex-1 rounded-2xl bg-white/70 py-3 shadow-sm">
             ランキング
           </Link>
         </div>

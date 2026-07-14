@@ -16,6 +16,14 @@ export function mapPerfectCountKey(username: string) {
 
 export const MAP_GRADUATES_KEY = "map-quiz:graduates";
 
+// 理科クイズ用
+export function scienceClearsKey(username: string) {
+  return `science-quiz:clears:${username}`;
+}
+
+export const SCIENCE_GRADUATES_KEY = "science-quiz:graduates";
+export const SCIENCE_STREAK_BEST_KEY = "science-quiz:streak-best";
+
 export function parseZRangeWithScores(flat: string[]): { member: string; score: number }[] {
   const result: { member: string; score: number }[] = [];
   for (let i = 0; i < flat.length; i += 2) {

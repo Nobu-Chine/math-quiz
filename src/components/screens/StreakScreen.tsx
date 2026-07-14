@@ -2,16 +2,21 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/questionBank";
-import { generateQuestion } from "@/lib/questionBank";
+import { generateQuestion as generateMathQuestion } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
 import type { AnswerRecord } from "@/lib/quiz-types";
 
 interface StreakScreenProps {
   onFinish: (streak: number, records: AnswerRecord[]) => void;
   onBack: () => void;
+  generateQuestion?: () => Question;
 }
 
-export default function StreakScreen({ onFinish, onBack }: StreakScreenProps) {
+export default function StreakScreen({
+  onFinish,
+  onBack,
+  generateQuestion = generateMathQuestion,
+}: StreakScreenProps) {
   const [question, setQuestion] = useState<Question>(() => generateQuestion());
   const [streak, setStreak] = useState(0);
   const [records, setRecords] = useState<AnswerRecord[]>([]);

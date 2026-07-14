@@ -8,15 +8,21 @@ interface WeaknessScreenProps {
   username: string;
   password: string;
   onBack: () => void;
+  statsApiPath?: string;
 }
 
-export default function WeaknessScreen({ username, password, onBack }: WeaknessScreenProps) {
+export default function WeaknessScreen({
+  username,
+  password,
+  onBack,
+  statsApiPath = "/api/stats",
+}: WeaknessScreenProps) {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/stats", { headers: authHeaders(username, password) })
+    fetch(statsApiPath, { headers: authHeaders(username, password) })
       .then((res) => res.json())
       .then((data: StatsData) => {
         if (!cancelled) setStats(data);
@@ -27,7 +33,7 @@ export default function WeaknessScreen({ username, password, onBack }: WeaknessS
     return () => {
       cancelled = true;
     };
-  }, [username, password]);
+  }, [username, password, statsApiPath]);
 
   const rows = stats
     ? Object.entries(stats)

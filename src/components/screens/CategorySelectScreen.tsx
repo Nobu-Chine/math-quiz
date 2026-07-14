@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CATEGORIES } from "@/lib/questionBank";
+import { CATEGORIES as MATH_CATEGORIES } from "@/lib/questionBank";
 import { authHeaders } from "@/lib/auth-headers";
 
 interface CategorySelectScreenProps {
@@ -10,6 +10,10 @@ interface CategorySelectScreenProps {
   onSelectCategory: (category: string) => void;
   onStartGraduation: () => void;
   onBack: () => void;
+  categories?: readonly string[];
+  progressApiPath?: string;
+  graduationQuestionCount?: number;
+  passRatePercent?: number;
 }
 
 interface Progress {
@@ -24,13 +28,17 @@ export default function CategorySelectScreen({
   onSelectCategory,
   onStartGraduation,
   onBack,
+  categories = MATH_CATEGORIES,
+  progressApiPath = "/api/progress",
+  graduationQuestionCount = 28,
+  passRatePercent = 80,
 }: CategorySelectScreenProps) {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/progress", { headers: authHeaders(username, password) })
+    fetch(progressApiPath, { headers: authHeaders(username, password) })
       .then((res) => res.json())
       .then((data: Progress) => {
         if (!cancelled) setProgress(data);
@@ -41,11 +49,11 @@ export default function CategorySelectScreen({
     return () => {
       cancelled = true;
     };
-  }, [username, password]);
+  }, [username, password, progressApiPath]);
 
   const clears = new Set(progress?.clears ?? []);
-  const allCleared = clears.size >= CATEGORIES.length;
-  const remaining = CATEGORIES.length - clears.size;
+  const allCleared = clears.size >= categories.length;
+  const remaining = categories.length - clears.size;
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -58,7 +66,7 @@ export default function CategorySelectScreen({
 
       {!loading && (
         <div className="flex flex-col gap-3">
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => onSelectCategory(category)}
@@ -90,7 +98,7 @@ export default function CategorySelectScreen({
             {allCleared ? "🎓 卒業テストに挑戦" : `卒業テストまで あと${remaining}カテゴリ`}
           </button>
           <p className="mt-2 text-center text-xs text-slate-400">
-            全カテゴリから28問出題・80%以上正解で卒業
+            全カテゴリから{graduationQuestionCount}問出題・{passRatePercent}%以上正解で卒業
           </p>
         </div>
       )}

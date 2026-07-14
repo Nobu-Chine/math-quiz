@@ -36,6 +36,15 @@ export default function Home() {
               >
                 沖縄マップクイズ
               </Link>
+              <div>
+                <Link
+                  href="/science"
+                  className="block w-full rounded-2xl bg-emerald-500 py-6 text-xl font-bold text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"
+                >
+                  理科クイズ
+                </Link>
+                <p className="mt-1 text-xs text-slate-400">中学1年生の理科を復習できるよ</p>
+              </div>
             </div>
           </>
         )}
