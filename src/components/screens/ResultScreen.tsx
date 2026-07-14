@@ -21,6 +21,7 @@ export default function ResultScreen({
   const rank = calcRank(score, total);
   const wrongAnswers = answers.filter((a) => !a.correct);
   const perfect = total > 0 && score === total;
+  const graduationPassed = total > 0 && score / total >= 0.8;
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -48,11 +49,13 @@ export default function ResultScreen({
         {mode === "category" && perfect && (
           <p className="mt-3 text-lg font-black text-emerald-500">🎉 カテゴリクリア!</p>
         )}
-        {mode === "graduation" && perfect && (
+        {mode === "graduation" && graduationPassed && (
           <p className="mt-3 text-lg font-black text-fuchsia-500">🎓 卒業おめでとう!</p>
         )}
-        {mode === "graduation" && !perfect && (
-          <p className="mt-3 text-sm font-semibold text-rose-500">不合格(何度でも再挑戦できるよ)</p>
+        {mode === "graduation" && !graduationPassed && (
+          <p className="mt-3 text-sm font-semibold text-rose-500">
+            不合格(80%以上正解で合格・何度でも再挑戦できるよ)
+          </p>
         )}
       </div>
 

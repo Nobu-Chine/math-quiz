@@ -89,6 +89,9 @@ export default function CategorySelectScreen({
           >
             {allCleared ? "🎓 卒業テストに挑戦" : `卒業テストまで あと${remaining}カテゴリ`}
           </button>
+          <p className="mt-2 text-center text-xs text-slate-400">
+            全カテゴリから28問出題・80%以上正解で卒業
+          </p>
         </div>
       )}
 

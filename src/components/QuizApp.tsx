@@ -23,7 +23,8 @@ import StreakResultScreen from "@/components/screens/StreakResultScreen";
 
 const QUESTION_COUNT = 5;
 const CATEGORY_QUESTION_COUNT = 10;
-const GRADUATION_QUESTION_COUNT = 15;
+const GRADUATION_QUESTION_COUNT = 28;
+const GRADUATION_PASS_RATE = 0.8;
 
 interface StreakResult {
   streak: number;
@@ -142,9 +143,12 @@ export default function QuizApp() {
     if (currentIndex + 1 >= questions.length) {
       submitResults(nextAnswers);
       const perfect = nextAnswers.length > 0 && nextAnswers.every((a) => a.correct);
+      const correctCount = nextAnswers.filter((a) => a.correct).length;
+      const passedGraduation =
+        nextAnswers.length > 0 && correctCount / nextAnswers.length >= GRADUATION_PASS_RATE;
       if (mode === "category" && activeCategory && perfect) {
         postProgress({ categoryClear: activeCategory });
-      } else if (mode === "graduation" && perfect) {
+      } else if (mode === "graduation" && passedGraduation) {
         postProgress({ graduate: true });
       }
       setScreen("result");
