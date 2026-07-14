@@ -17,7 +17,6 @@ export default function Home() {
         ) : (
           <>
             <div>
-              <p className="text-sm font-semibold tracking-wide text-violet-500">6年生</p>
               <h1 className="mt-2 text-3xl font-bold text-slate-700">クイズポータル</h1>
               <p className="mt-3 text-slate-500">遊びたいクイズを選んでね</p>
             </div>
