@@ -442,16 +442,198 @@ function g6_average(){
     explain:`平均は「全部を足してから、個数で割る」と求められる。まず全部たすと ${nums.join('+')} = ${total}。データは${count}個あるので、${total} ÷ ${count} = ${ans}`, category:'データの調べ方'};
 }
 
-const G6_POOL = [g6_symmetry, g6_letterEq, g6_fracMul, g6_fracDiv,
+function g6_pointSymmetry(){
+  const dist = randInt(3,20);
+  return {text:`点対称な図形で、対称の中心Oから点Aまでの距離が${dist}cmです。点Aに対応する点Bまでの距離は何cm？`, type:'numeric', answer:dist,
+    explain:`点対称な図形では、対応する2つの点は対称の中心Oを通る直線上にあり、Oからの距離が等しくなる。だから点Bまでの距離も${dist}cm`, category:'対称な図形'};
+}
+
+function g6_surfaceArea(){
+  if(Math.random()<0.5){
+    const a=randInt(2,10), b=randInt(2,10), c=randInt(2,10);
+    const ans = 2*(a*b+b*c+c*a);
+    return {text:`たて${a}cm、よこ${b}cm、高さ${c}cmの直方体の表面積は？`, type:'numeric', answer:ans,
+      explain:`直方体には合同な面が2つずつ3組ある。たて×よこ=${a*b}cm²、よこ×高さ=${b*c}cm²、たて×高さ=${c*a}cm²。これらを2倍ずつして全部たすと (${a*b}+${b*c}+${c*a})×2 = ${ans}cm²`, category:'角柱と円柱の体積'};
+  } else {
+    const r=randInt(2,8), h=randInt(3,15);
+    const baseArea=Math.round(r*r*3.14*100)/100;
+    const sideArea=Math.round(2*r*3.14*h*100)/100;
+    const ans=Math.round((r*r*3.14*2 + 2*r*3.14*h)*100)/100;
+    return {text:`底面の半径${r}cm、高さ${h}cmの円柱の表面積は？(円周率3.14)`, type:'numeric', answer:ans, tolerance:0.1,
+      explain:`円柱の表面積は「底面積×2 + 側面積」で求める。底面積は 半径×半径×3.14 = ${r}×${r}×3.14 = ${baseArea}cm²。側面積は「底面の周の長さ×高さ」= (2×${r}×3.14)×${h} = ${sideArea}cm²。合わせて ${baseArea}×2 + ${sideArea} = ${ans}cm²`, category:'角柱と円柱の体積'};
+  }
+}
+
+function g6_median(){
+  const count = [5,7][randInt(0,1)];
+  const nums=[];
+  for(let i=0;i<count;i++) nums.push(randInt(1,30));
+  const sorted=[...nums].sort((a,b)=>a-b);
+  const middleIdx = Math.floor(count/2);
+  const median = sorted[middleIdx];
+  return {text:`${nums.join('、')} の中央値は？`, type:'numeric', answer:median,
+    explain:`中央値は、データを小さい順に並べたときのちょうど真ん中の値。小さい順に並べると ${sorted.join('、')} となり、真ん中(${middleIdx+1}番目)の値は ${median}`, category:'データの調べ方'};
+}
+
+function g6_mode(){
+  const modeVal = randInt(1,20);
+  const others = new Set();
+  while(others.size<4){
+    const v = randInt(1,20);
+    if(v!==modeVal) others.add(v);
+  }
+  const nums = shuffle([modeVal, modeVal, modeVal, ...others]);
+  return {text:`${nums.join('、')} の最頻値は？`, type:'numeric', answer:modeVal,
+    explain:`最頻値は、データの中で最も多く出てくる値。${modeVal}が3回出てきていて、他の数字は1回ずつなので、最頻値は${modeVal}`, category:'データの調べ方'};
+}
+
+function g6_fracDecimalMul(){
+  const decNum = randInt(1,9);
+  const n2=randInt(1,8), d2=randInt(2,9);
+  const num = decNum*n2, den = 10*d2;
+  const g = gcd(num, den);
+  const sn = num/g, sd = den/g;
+  const correct = fracToText(sn, sd);
+  const decText = (decNum/10).toString();
+  const choices=new Set([correct]);
+  let tries=0;
+  while(choices.size<4 && tries<25){
+    tries++;
+    const dn=num+randInt(-3,3), dd=den+randInt(-2,2);
+    if(dn<=0||dd<=0) continue;
+    const gg=gcd(dn,dd);
+    choices.add(fracToText(dn/gg, dd/gg));
+  }
+  const needsSimplify5 = g>1;
+  return {text:`${decText} × ${n2}/${d2} = ?`, type:'choice', answer:correct,
+    choices:shuffle([...choices]),
+    explain:`小数はまず分数になおしてから計算する。${decText} = ${decNum}/10。あとは分数どうしのかけ算: ${decNum}/10 × ${n2}/${d2} = ${num}/${den}${needsSimplify5 ? `。約分すると ${correct}` : ``}`,
+    category:'分数と小数の混じった計算'};
+}
+
+function g6_fracDecimalAdd(){
+  const fracDenOptions=[2,5,10];
+  const fracDen = fracDenOptions[randInt(0,2)];
+  const fracNum = randInt(1, fracDen-1);
+  const scale = 10/fracDen;
+  const fracNumIn10 = fracNum*scale;
+  let decNum = randInt(1,9);
+  while(decNum === fracNumIn10) decNum = randInt(1,9);
+  const isAdd = decNum < fracNumIn10 ? true : Math.random()<0.5;
+  const resultNum = isAdd ? decNum + fracNumIn10 : decNum - fracNumIn10;
+  const opText = isAdd ? '+' : '−';
+  const g = gcd(resultNum, 10);
+  const sn = resultNum/g, sd = 10/g;
+  const correct = fracToText(sn, sd);
+  const decText = (decNum/10).toString();
+  const fracText = fracToText(fracNum, fracDen);
+  const choices=new Set([correct]);
+  let tries=0;
+  while(choices.size<4 && tries<25){
+    tries++;
+    const dn=resultNum+randInt(-3,3);
+    if(dn<=0) continue;
+    const gg=gcd(dn,10);
+    choices.add(fracToText(dn/gg, 10/gg));
+  }
+  const needsSimplify6 = g>1;
+  return {text:`${decText} ${opText} ${fracText} = ?`, type:'choice', answer:correct,
+    choices:shuffle([...choices]),
+    explain:`小数と分数を計算するときは、分母をそろえる。${decText} = ${decNum}/10、${fracText} = ${fracNumIn10}/10 なので、${decNum}/10 ${opText} ${fracNumIn10}/10 = ${resultNum}/10${needsSimplify6 ? `。約分すると ${correct}` : ``}`,
+    category:'分数と小数の混じった計算'};
+}
+
+function g6_unitConvert(){
+  const conversions = [
+    {from:'km', to:'m', factor:1000},
+    {from:'m', to:'cm', factor:100},
+    {from:'kg', to:'g', factor:1000},
+    {from:'L', to:'mL', factor:1000},
+    {from:'m', to:'km', factor:0.001},
+    {from:'cm', to:'m', factor:0.01},
+    {from:'g', to:'kg', factor:0.001},
+    {from:'mL', to:'L', factor:0.001},
+  ];
+  const c = conversions[randInt(0,conversions.length-1)];
+  let value, ans;
+  if(c.factor>=1){
+    value = randInt(1,20);
+    ans = value*c.factor;
+  } else {
+    const base = Math.round(1/c.factor);
+    value = randInt(1,20)*base;
+    ans = value*c.factor;
+  }
+  const divisor = c.factor>=1 ? c.factor : Math.round(1/c.factor);
+  return {text:`${value}${c.from} は 何${c.to}？`, type:'numeric', answer:Math.round(ans*1000)/1000,
+    explain:`${c.from}を${c.to}になおすには、${c.factor>=1?`${divisor}をかける`:`${divisor}で割る`}。${value} ${c.factor>=1?'×':'÷'} ${divisor} = ${ans}`, category:'単位と概数'};
+}
+
+function g6_roundedRange(){
+  const roundUnit = [10,100][randInt(0,1)];
+  const half = roundUnit/2;
+  const base = randInt(2,20)*roundUnit;
+  const lower = base - half;
+  const upper = base + half;
+  const correct = `${lower}以上${upper}未満`;
+  const choices = new Set([correct]);
+  choices.add(`${lower}以上${upper+roundUnit}未満`);
+  choices.add(`${lower-roundUnit}以上${upper}未満`);
+  choices.add(`${base}以上${upper}未満`);
+  const placeText = roundUnit===10 ? '十の位' : '百の位';
+  return {text:`${placeText}までの概数にすると${base}になる整数の範囲を表そう`, type:'choice', answer:correct,
+    choices:shuffle([...choices]),
+    explain:`${placeText}までの概数にして${base}になるのは、${base}より${half}小さい数(${lower})以上、${base}より${half}大きい数(${upper})未満の範囲。四捨五入で考えると、${lower}は切り上がって${base}になり、${upper}は次の概数に切り上がってしまうので含まれない。だから「${correct}」`, category:'単位と概数'};
+}
+
+function g6_speed(){
+  const type = randInt(0,2);
+  if(type===0){
+    const speed = randInt(2,12)*10;
+    const time = randInt(2,6);
+    const distance = speed*time;
+    return {text:`${distance}mの道のりを${time}秒で走ると、速さは秒速何m？`, type:'numeric', answer:speed,
+      explain:`速さは「道のり÷時間」で求める。${distance} ÷ ${time} = ${speed}。だから秒速${speed}m`, category:'速さ'};
+  } else if(type===1){
+    const speed = randInt(2,20);
+    const time = randInt(2,10);
+    const distance = speed*time;
+    return {text:`分速${speed}mで${time}分歩くと、進む道のりは何m？`, type:'numeric', answer:distance,
+      explain:`道のりは「速さ×時間」で求める。${speed} × ${time} = ${distance}。だから${distance}m`, category:'速さ'};
+  } else {
+    const speed = randInt(2,15);
+    const time = randInt(2,10);
+    const distance = speed*time;
+    return {text:`時速${speed}kmで走ると、${distance}km進むのにかかる時間は何時間？`, type:'numeric', answer:time,
+      explain:`時間は「道のり÷速さ」で求める。${distance} ÷ ${speed} = ${time}。だから${time}時間`, category:'速さ'};
+  }
+}
+
+function g6_speedUnitConvert(){
+  const base = randInt(1,20);
+  const ans = base*60;
+  if(Math.random()<0.5){
+    return {text:`秒速${base}mは、分速何m？`, type:'numeric', answer:ans,
+      explain:`秒速を分速になおすには60をかける(1分=60秒だから、1分間に進む距離は60倍になる)。${base} × 60 = ${ans}。だから分速${ans}m`, category:'速さ'};
+  } else {
+    return {text:`分速${base}mは、時速何m？`, type:'numeric', answer:ans,
+      explain:`分速を時速になおすには60をかける(1時間=60分だから、1時間に進む距離は60倍になる)。${base} × 60 = ${ans}。だから時速${ans}m`, category:'速さ'};
+  }
+}
+
+const G6_POOL = [g6_symmetry, g6_pointSymmetry, g6_letterEq, g6_fracMul, g6_fracDiv,
   g6_fracMulMixed, g6_intFracMul, g6_ratio,
-  g6_scale, g6_circleArea, g6_volume, g6_proportion, g6_permCombo, g6_average];
+  g6_scale, g6_circleArea, g6_volume, g6_surfaceArea, g6_proportion, g6_permCombo, g6_average,
+  g6_median, g6_mode, g6_fracDecimalMul, g6_fracDecimalAdd,
+  g6_unitConvert, g6_roundedRange, g6_speed, g6_speedUnitConvert];
 function genG6(){ return G6_POOL[randInt(0,G6_POOL.length-1)](); }
 
-// このアプリで実際に使う一覧(6年生・13カテゴリ)
+// このアプリで実際に使う一覧(6年生・14カテゴリ)
 export const CATEGORIES = [
   '対称な図形', '文字と式', '分数のかけ算', '分数のわり算', '比',
   '拡大図と縮図', '円の面積', '角柱と円柱の体積', '比例と反比例',
-  '並べ方と組み合わせ方', 'データの調べ方'
+  '並べ方と組み合わせ方', 'データの調べ方',
+  '分数と小数の混じった計算', '単位と概数', '速さ'
 ];
 
 // 1問生成する(現状は6年生固定。将来学年を増やすならここを差し替え)
