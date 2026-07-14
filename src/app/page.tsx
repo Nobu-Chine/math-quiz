@@ -45,6 +45,15 @@ export default function Home() {
                 </Link>
                 <p className="mt-1 text-xs text-slate-400">中学1年生の理科を復習できるよ</p>
               </div>
+              <div>
+                <Link
+                  href="/math1"
+                  className="block w-full rounded-2xl bg-amber-500 py-6 text-xl font-bold text-white shadow-lg shadow-amber-200 transition-transform active:scale-95"
+                >
+                  数学クイズ
+                </Link>
+                <p className="mt-1 text-xs text-slate-400">中学1年生の数学を復習できるよ</p>
+              </div>
             </div>
           </>
         )}
