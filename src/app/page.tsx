@@ -21,12 +21,15 @@ export default function Home() {
               <p className="mt-3 text-slate-500">遊びたいクイズを選んでね</p>
             </div>
             <div className="flex w-full flex-col gap-4">
-              <Link
-                href="/math"
-                className="w-full rounded-2xl bg-violet-500 py-6 text-xl font-bold text-white shadow-lg shadow-violet-200 transition-transform active:scale-95"
-              >
-                算数クイズ
-              </Link>
+              <div>
+                <Link
+                  href="/math"
+                  className="block w-full rounded-2xl bg-violet-500 py-6 text-xl font-bold text-white shadow-lg shadow-violet-200 transition-transform active:scale-95"
+                >
+                  算数クイズ
+                </Link>
+                <p className="mt-1 text-xs text-slate-400">6年生の算数を復習できるよ</p>
+              </div>
               <Link
                 href="/map"
                 className="w-full rounded-2xl bg-sky-600 py-6 text-xl font-bold text-white shadow-lg shadow-sky-200 transition-transform active:scale-95"
