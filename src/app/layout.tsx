@@ -17,6 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "算数クイズ",
   description: "6年生の算数を復習するクイズアプリ",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export const viewport = {
