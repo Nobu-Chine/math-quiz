@@ -73,7 +73,7 @@ export function generateCategoryQuiz(category: string, count = 6): Question[] {
 }
 
 // 総合テスト: 全単元からできるだけ均等に(基本1問ずつ)出題する
-export function generateGraduationQuiz(count = CATEGORIES.length): Question[] {
+export function generateGraduationQuiz(count: number = CATEGORIES.length): Question[] {
   const categories = CATEGORIES as unknown as string[];
   const base = Math.floor(count / categories.length);
   const remainder = count % categories.length;

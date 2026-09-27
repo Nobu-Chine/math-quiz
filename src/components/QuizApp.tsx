@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/questionBank";
-import {
-  generateNormalQuiz,
-  generateCampQuiz,
-  generateCategoryQuiz,
-  generateGraduationQuiz,
-} from "@/lib/quiz-generator";
+import type { SubjectConfig } from "@/lib/subjects/types";
 import type { AnswerRecord, QuizMode, Screen } from "@/lib/quiz-types";
 import type { QuizResultEntry, StatsData } from "@/lib/stats";
 import { authHeaders } from "@/lib/auth-headers";
@@ -21,9 +16,6 @@ import CategorySelectScreen from "@/components/screens/CategorySelectScreen";
 import StreakScreen from "@/components/screens/StreakScreen";
 import StreakResultScreen from "@/components/screens/StreakResultScreen";
 
-const QUESTION_COUNT = 5;
-const CATEGORY_QUESTION_COUNT = 10;
-const GRADUATION_QUESTION_COUNT = 28;
 const GRADUATION_PASS_RATE = 0.8;
 
 interface StreakResult {
@@ -32,7 +24,8 @@ interface StreakResult {
   newBest: boolean;
 }
 
-export default function QuizApp() {
+export default function QuizApp({ subject }: { subject: SubjectConfig }) {
+  const { generator } = subject;
   const { auth, ready } = useAuth();
   const [screen, setScreen] = useState<Screen>("top");
   const [mode, setMode] = useState<QuizMode>("normal");
@@ -52,7 +45,7 @@ export default function QuizApp() {
     streak?: number;
   }): Promise<{ bestStreak: number; newBest: boolean } | null> {
     if (!auth) return Promise.resolve(null);
-    return fetch("/api/progress", {
+    return fetch(subject.progressApiPath, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: auth.username, password: auth.password, ...body }),
@@ -71,15 +64,15 @@ export default function QuizApp() {
     if (nextMode === "camp") {
       setScreen("loading");
       try {
-        const stats: StatsData = await fetch("/api/stats", {
+        const stats: StatsData = await fetch(subject.statsApiPath, {
           headers: authHeaders(auth.username, auth.password),
         }).then((res) => res.json());
-        setQuestions(generateCampQuiz(QUESTION_COUNT, stats));
+        setQuestions(generator.generateCampQuiz(subject.questionCount, stats));
       } catch {
-        setQuestions(generateNormalQuiz(QUESTION_COUNT));
+        setQuestions(generator.generateNormalQuiz(subject.questionCount));
       }
     } else {
-      setQuestions(generateNormalQuiz(QUESTION_COUNT));
+      setQuestions(generator.generateNormalQuiz(subject.questionCount));
     }
     setScreen("quiz");
   }
@@ -90,7 +83,7 @@ export default function QuizApp() {
     setActiveCategory(category);
     setAnswers([]);
     setCurrentIndex(0);
-    setQuestions(generateCategoryQuiz(category, CATEGORY_QUESTION_COUNT));
+    setQuestions(generator.generateCategoryQuiz(category, subject.categoryQuestionCount));
     setScreen("quiz");
   }
 
@@ -100,7 +93,7 @@ export default function QuizApp() {
     setActiveCategory(null);
     setAnswers([]);
     setCurrentIndex(0);
-    setQuestions(generateGraduationQuiz(GRADUATION_QUESTION_COUNT));
+    setQuestions(generator.generateGraduationQuiz(subject.graduationQuestionCount));
     setScreen("quiz");
   }
 
@@ -129,7 +122,7 @@ export default function QuizApp() {
       category: r.question.category,
       correct: r.correct,
     }));
-    fetch("/api/stats", {
+    fetch(subject.statsApiPath, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: auth.username, password: auth.password, results }),
@@ -170,9 +163,11 @@ export default function QuizApp() {
 
   if (!ready) return null;
 
+  const containerClass = `flex min-h-dvh w-full flex-col items-center bg-gradient-to-b ${subject.backgroundClass} px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]`;
+
   if (!auth) {
     return (
-      <div className="flex min-h-dvh w-full flex-col items-center bg-gradient-to-b from-sky-100 via-violet-100 to-rose-100 px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]">
+      <div className={containerClass}>
         <div className="flex w-full max-w-md flex-1 flex-col">
           <LoginForm />
         </div>
@@ -181,10 +176,15 @@ export default function QuizApp() {
   }
 
   return (
-    <div className="flex min-h-dvh w-full flex-col items-center bg-gradient-to-b from-sky-100 via-violet-100 to-rose-100 px-4 pb-8 pt-[max(2.5rem,env(safe-area-inset-top))]">
+    <div className={containerClass}>
       <div className="flex w-full max-w-md flex-1 flex-col">
         {screen === "top" && (
           <TopScreen
+            gradeLabel={subject.gradeLabel}
+            title={subject.title}
+            description={subject.description}
+            graduatesHref={subject.graduatesHref}
+            rankingHref={subject.rankingHref}
             onStart={() => startQuiz("normal")}
             onStartCamp={() => startQuiz("camp")}
             onShowCategorySelect={() => setScreen("category-select")}
@@ -194,7 +194,7 @@ export default function QuizApp() {
         )}
         {screen === "loading" && (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-            <p className="text-4xl">🏕️</p>
+            <p className="text-4xl">{subject.loadingEmoji}</p>
             <p className="font-semibold text-slate-600">にがてぶんやをチェック中…</p>
           </div>
         )}
@@ -202,6 +202,10 @@ export default function QuizApp() {
           <CategorySelectScreen
             username={auth.username}
             password={auth.password}
+            categories={subject.categories}
+            progressApiPath={subject.progressApiPath}
+            graduationQuestionCount={subject.graduationQuestionCount}
+            passRatePercent={Math.round(GRADUATION_PASS_RATE * 100)}
             onSelectCategory={startCategoryQuiz}
             onStartGraduation={startGraduationQuiz}
             onBack={() => setScreen("top")}
@@ -219,7 +223,11 @@ export default function QuizApp() {
           />
         )}
         {screen === "streak" && (
-          <StreakScreen onFinish={handleStreakFinish} onBack={() => setScreen("top")} />
+          <StreakScreen
+            generateQuestion={generator.generateQuestion}
+            onFinish={handleStreakFinish}
+            onBack={() => setScreen("top")}
+          />
         )}
         {screen === "streak-result" && (
           <StreakResultScreen
@@ -243,6 +251,7 @@ export default function QuizApp() {
           <WeaknessScreen
             username={auth.username}
             password={auth.password}
+            statsApiPath={subject.statsApiPath}
             onBack={() => setScreen("top")}
           />
         )}
