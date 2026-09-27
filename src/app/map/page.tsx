@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { authHeaders } from "@/lib/auth-headers";
 import LoginForm from "@/components/LoginForm";
 import styles from "./map.module.css";
+import { shuffle } from "@/lib/shuffle";
 
 const TOTAL = MUNI_DATA.length;
 const GRADUATION_THRESHOLD = 3;
@@ -17,15 +18,6 @@ interface MapStatus {
   perfectCount: number;
   graduated: boolean;
   graduatedAt: string | null;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 function calcRank(time: number, miss: number): string {

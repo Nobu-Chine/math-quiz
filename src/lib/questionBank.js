@@ -3,16 +3,10 @@
 // (Claude.aiのArtifactsで作った math_review_game.html から移植・動作確認済み)
 // 1〜5年生の生成関数も残してあるので、将来「学年を選べる」機能を復活させたい時にも使えます。
 
+import { shuffle } from "@/lib/shuffle";
+
 function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
 function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
-function shuffle(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
-}
 
 // ---------- 学年ごとの問題生成 ----------
 function genG1(){

@@ -4,15 +4,7 @@ import { useMemo, useState } from "react";
 import type { Question } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
 import type { AnswerRecord, QuizMode } from "@/lib/quiz-types";
-
-function shuffle<T>(items: T[]): T[] {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+import { shuffle } from "@/lib/shuffle";
 
 interface QuizScreenProps {
   question: Question;

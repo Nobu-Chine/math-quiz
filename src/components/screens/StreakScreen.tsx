@@ -5,15 +5,7 @@ import type { Question } from "@/lib/questionBank";
 import { generateQuestion as generateMathQuestion } from "@/lib/questionBank";
 import { isCorrectAnswer } from "@/lib/answer";
 import type { AnswerRecord } from "@/lib/quiz-types";
-
-function shuffle<T>(items: T[]): T[] {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+import { shuffle } from "@/lib/shuffle";
 
 interface StreakScreenProps {
   onFinish: (streak: number, records: AnswerRecord[]) => void;

@@ -1,17 +1,9 @@
 import { CATEGORIES, SCIENCE_QUESTIONS } from "@/lib/scienceQuestionBank";
 import type { Question } from "@/lib/questionBank";
 import type { StatsData } from "@/lib/stats";
+import { shuffle } from "@/lib/shuffle";
 
 export { CATEGORIES };
-
-function shuffle<T>(items: T[]): T[] {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 function poolFor(category: string): Question[] {
   return SCIENCE_QUESTIONS.filter((q) => q.category === category);
