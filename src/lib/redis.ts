@@ -6,6 +6,10 @@ export function clearsKey(username: string) {
   return `math-quiz:clears:${username}`;
 }
 
+export function statsKey(username: string) {
+  return `math-quiz:stats:${username}`;
+}
+
 export const GRADUATES_KEY = "math-quiz:graduates";
 export const STREAK_BEST_KEY = "math-quiz:streak-best";
 
@@ -21,12 +25,20 @@ export function scienceClearsKey(username: string) {
   return `science-quiz:clears:${username}`;
 }
 
+export function scienceStatsKey(username: string) {
+  return `science-quiz:stats:${username}`;
+}
+
 export const SCIENCE_GRADUATES_KEY = "science-quiz:graduates";
 export const SCIENCE_STREAK_BEST_KEY = "science-quiz:streak-best";
 
 // 中学1年 数学クイズ用
 export function math1ClearsKey(username: string) {
   return `math1-quiz:clears:${username}`;
+}
+
+export function math1StatsKey(username: string) {
+  return `math1-quiz:stats:${username}`;
 }
 
 export const MATH1_GRADUATES_KEY = "math1-quiz:graduates";
