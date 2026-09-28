@@ -6,6 +6,7 @@ import {
   generateCategoryQuiz,
   generateGraduationQuiz,
 } from "@/lib/science-quiz-generator";
+import { scienceTheme } from "@/lib/themes";
 import type { SubjectConfig } from "./types";
 
 // 中学1年 理科
@@ -17,7 +18,7 @@ export const scienceSubject: SubjectConfig = {
   graduatesHref: "/science/graduates",
   rankingHref: "/science/ranking",
 
-  backgroundClass: "from-emerald-100 via-teal-100 to-sky-100",
+  backgroundClass: scienceTheme.backgroundClass,
   loadingEmoji: "🔬",
 
   progressApiPath: "/api/science/progress",

@@ -5,6 +5,7 @@ import {
   generateCategoryQuiz,
   generateGraduationQuiz,
 } from "@/lib/quiz-generator";
+import { mathTheme } from "@/lib/themes";
 import type { SubjectConfig } from "./types";
 
 // 6年生 算数
@@ -16,7 +17,7 @@ export const mathSubject: SubjectConfig = {
   graduatesHref: "/graduates",
   rankingHref: "/ranking",
 
-  backgroundClass: "from-sky-100 via-violet-100 to-rose-100",
+  backgroundClass: mathTheme.backgroundClass,
   loadingEmoji: "🏕️",
 
   progressApiPath: "/api/progress",
