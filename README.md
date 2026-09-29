@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# クイズポータル
 
-## Getting Started
+小中学生向けの学習クイズアプリ。スマホで遊べて、ログインすると進み具合やランキングが保存される。
 
-First, run the development server:
+**公開URL:** https://math-quiz-beige-iota.vercel.app/
+
+## 遊べるクイズ
+
+| クイズ | 対象 | パス |
+|---|---|---|
+| 沖縄マップクイズ | 沖縄本島の市町村 | `/map` |
+| 算数クイズ | 小学6年生 | `/math` |
+| 理科クイズ | 中学1年生 | `/science` |
+| 数学クイズ | 中学1年生 | `/math1` |
+
+## 主な機能
+
+- **通常モード**: ランダムに出題される練習問題
+- **合宿モード**: 苦手な問題を集中して復習
+- **カテゴリ別チャレンジ**: カテゴリごとに制覇を目指す
+- **卒業テスト**: 全カテゴリ制覇後に挑戦できる総まとめテスト
+- **ランキング / 卒業生一覧**: 連続正解の記録と卒業テスト合格者を表示
+- **ログイン**: ユーザー名とパスワードで進み具合を保存（全クイズ共通アカウント）
+
+## 使っている技術
+
+- [Next.js](https://nextjs.org/) 16（App Router）/ React 19 / TypeScript
+- Tailwind CSS 4
+- [Upstash Redis](https://upstash.com/)（ユーザー情報・進み具合・ランキングの保存）
+- bcryptjs（パスワードのハッシュ化）
+- Vercel（デプロイ）
+
+## ローカルで動かす
+
+```bash
+npm install
+```
+
+プロジェクト直下に `.env.local` を作り、Upstash Redis の接続情報を書く（Vercel の Upstash 連携で発行される名前でもOK）。
+
+```
+KV_REST_API_URL=https://xxxx.upstash.io
+KV_REST_API_TOKEN=xxxx
+```
+
+開発サーバーを起動して http://localhost:3000 を開く。
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> 本番データを壊さないよう、ローカルでは本番とは別の Redis データベースを使うのがおすすめ。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## フォルダ構成
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                 # ページとAPI（Next.js App Router）
+│   ├── page.tsx         # トップ（クイズ選択）
+│   ├── map/             # 沖縄マップクイズ
+│   ├── math/ math1/ science/  # 各教科のクイズ
+│   ├── ranking/ graduates/    # ランキング・卒業生一覧
+│   └── api/             # ログイン・進み具合・成績のAPI
+├── components/          # 画面部品（QuizApp は全教科共通のクイズ画面）
+├── context/             # ログイン状態の管理
+└── lib/
+    ├── subjects/        # 教科ごとの設定（タイトル・カテゴリ・問題数など）
+    ├── *QuestionBank.*  # 問題データ
+    └── redis.ts         # Redis の接続とキー定義
+```
 
-## Learn More
+新しい教科を追加するときは、`src/lib/subjects/` に設定ファイルを足し、`src/app/` にページを作る。
 
-To learn more about Next.js, take a look at the following resources:
+## デプロイ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`main` ブランチに push すると Vercel が自動でデプロイする。環境変数（Redis の接続情報）は Vercel のプロジェクト設定で管理している。
