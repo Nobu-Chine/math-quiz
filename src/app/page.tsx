@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import LoginForm from "@/components/LoginForm";
+import ShareButton from "@/components/ShareButton";
 
 export default function Home() {
   const { auth, ready } = useAuth();
@@ -60,6 +61,7 @@ export default function Home() {
             </div>
           </>
         )}
+        <ShareButton />
       </div>
     </div>
   );
