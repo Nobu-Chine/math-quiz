@@ -15,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "算数クイズ",
-  description: "6年生の算数を復習するクイズアプリ",
+  title: {
+    default: "クイズポータル",
+    template: "%s | クイズポータル",
+  },
+  description: "算数・数学・理科・沖縄の地図を楽しく復習できるクイズアプリ",
   robots: {
     index: false,
     follow: false,
